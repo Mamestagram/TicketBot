@@ -11,17 +11,21 @@ public abstract class Message {
         EmbedBuilder eb = new EmbedBuilder();
 
         eb.addField("Support", "To receive assistance from developer or admin, please create a ticket. No matter how trivial it may seem!", true);
-        eb.setDescription("mamesosu.net | Ticket Tool");
+        eb.setFooter("mamesosu.net | Ticket Tool");
         eb.setColor(Color.CYAN);
 
         return eb;
     }
 
-    //メッセージを閉じるときのメッセージ (開いた時すぐに送信される)
-    public static EmbedBuilder getCreateTicketMessage() {
+    public static EmbedBuilder getHelpTicketMessage() {
         EmbedBuilder eb = new EmbedBuilder();
+        eb.addField("Support", """
+                Welcome to Mamestagram Support!
+                We help you with your problems.
+                To get you started, please select the issue that most closely describes what you need help with.""", false);
+        eb.setFooter("mamesosu.net | Ticket Tool");
+        eb.setColor(Color.GREEN);
 
-        //WIP
         return eb;
     }
 }
