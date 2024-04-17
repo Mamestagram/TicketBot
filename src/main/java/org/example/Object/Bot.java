@@ -1,36 +1,78 @@
 package org.example.Object;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.example.Event.CreateChannel;
+import org.example.Event.DeleteChannel;
 
 public class Bot {
 
-    private String MYSQL_HOST;
-    private String MYSQL_USER;
-    private String MYSQL_PASSWORD;
-    private String OSU_APIKEY;
+    private long GUILD_ID;
+    private long CHANNEL_ID;
+    private String TOKEN;
+    private long CATEGORY_ID;
+    private JDA jda;
 
     public Bot() {
         Dotenv dotenv = Dotenv.configure()
                 .load();
-        this.MYSQL_HOST = dotenv.get("HOST");
-        this.MYSQL_USER = dotenv.get("USER");
-        this.MYSQL_PASSWORD = dotenv.get("PASSWORD");
-        this.OSU_APIKEY = dotenv.get("API");
+
+        GUILD_ID = Long.parseLong(dotenv.get("GUILD_ID"));
+        CHANNEL_ID = Long.parseLong(dotenv.get("CHANNEL_ID"));
+        TOKEN = dotenv.get("TOKEN");
+        CATEGORY_ID = Long.parseLong(dotenv.get("CATEGORY_ID"));
     }
 
-    public String getMYSQL_HOST() {
-        return MYSQL_HOST;
+    public long getCHANNEL_ID() {
+        return CHANNEL_ID;
     }
 
-    public String getMYSQL_PASSWORD() {
-        return MYSQL_PASSWORD;
+    public long getGUILD_ID() {
+        return GUILD_ID;
     }
 
-    public String getMYSQL_USER() {
-        return MYSQL_USER;
+    public String getTOKEN() {
+        return TOKEN;
     }
 
-    public String getOSU_APIKEY() {
-        return OSU_APIKEY;
+    public JDA getJda() {
+        return jda;
     }
+
+    public long getCATEGORY_ID() {
+        return CATEGORY_ID;
+    }
+
+    public void loadJDA() {
+        jda = JDABuilder.createDefault(this.TOKEN)
+                .setRawEventsEnabled(true)
+                .enableIntents(
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.MESSAGE_CONTENT,
+                        GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.GUILD_EMOJIS_AND_STICKERS
+                ).enableCache(
+                        CacheFlag.MEMBER_OVERRIDES,
+                        CacheFlag.ROLE_TAGS,
+                        CacheFlag.EMOJI
+                )
+                .disableCache(
+                        CacheFlag.VOICE_STATE,
+                        CacheFlag.STICKER,
+                        CacheFlag.SCHEDULED_EVENTS
+                ).setActivity(
+                        Activity.playing("Loading all settings.."))
+                .addEventListeners(new CreateChannel())
+                .addEventListeners(new DeleteChannel())
+                .build();
+    }
+
+
 }
