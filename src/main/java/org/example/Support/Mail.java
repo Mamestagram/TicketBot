@@ -2,6 +2,7 @@ package org.example.Support;
 
 import org.example.Main;
 import org.example.Object.Database;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -14,14 +15,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 
 public abstract class Mail {
 
-    //returnで0を返した時、無効なリクエストとなる
-    private static int createRandomVerificationCode(String user) {
+    //returnでerrを返した時、無効なリクエストとなる
+    private static String createRandomVerificationCode(String user) {
 
+        BCryptPasswordEncoder bcpe = new BCryptPasswordEncoder();
         PreparedStatement ps;
         ResultSet result;
 
@@ -30,6 +33,7 @@ public abstract class Mail {
         try {
             Database d = Main.database;
             int verification_code = random.nextInt(100001, 999999);
+            String hash = bcpe.encode(String.valueOf(verification_code));
             Connection connection = d.getConnection(d.getDB_HOST(), d.getDB_NAME(), d.getDB_USER(), d.getDB_PASSWORD());
 
             ps = connection.prepareStatement("select id from users where name = ?");
@@ -38,16 +42,16 @@ public abstract class Mail {
 
             if(result.next()) {
                 ps = connection.prepareStatement("update users set verification_code = ? where id = ?");
-                ps.setInt(1, verification_code);
+                ps.setString(1, hash);
                 ps.setInt(2, result.getInt("id"));
                 ps.executeUpdate();
-                return verification_code;
+                return hash;
             }
 
-            return 0;
+            return "err";
         } catch (SQLException e) {
             e.printStackTrace();
-            return 0;
+            return "err";
         }
     }
 
@@ -76,9 +80,9 @@ public abstract class Mail {
         });
         try {
 
-            int verificationCode = createRandomVerificationCode(user);
+            String verificationCode = createRandomVerificationCode(user);
 
-            if(verificationCode == 0) return false;
+            if(Objects.equals(verificationCode, "err")) return false;
 
             Message message = new MimeMessage(session);
             //受信元
