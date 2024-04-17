@@ -6,6 +6,7 @@ import java.awt.*;
 
 public abstract class Message {
 
+    //チケットを開くときのメッセージ
     public static EmbedBuilder getOpenTicketMessage() {
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -13,6 +14,14 @@ public abstract class Message {
         eb.setDescription("mamesosu.net | Ticket Tool");
         eb.setColor(Color.CYAN);
 
+        return eb;
+    }
+
+    //メッセージを閉じるときのメッセージ (開いた時すぐに送信される)
+    public static EmbedBuilder getCreateTicketMessage() {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        //WIP
         return eb;
     }
 }

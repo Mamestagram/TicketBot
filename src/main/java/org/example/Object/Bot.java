@@ -17,6 +17,7 @@ public class Bot {
     private long CHANNEL_ID;
     private String TOKEN;
     private long CATEGORY_ID;
+
     private JDA jda;
 
     public Bot() {
