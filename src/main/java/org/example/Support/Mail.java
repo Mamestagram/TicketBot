@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 
+// メールの送信関連のクラス
 public abstract class Mail {
 
     //returnでerrを返した時、無効なリクエストとなる
@@ -45,9 +46,12 @@ public abstract class Mail {
                 ps.setString(1, hash);
                 ps.setInt(2, result.getInt("id"));
                 ps.executeUpdate();
+
+                connection.close();
                 return hash;
             }
 
+            connection.close();
             return "err";
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,7 +59,13 @@ public abstract class Mail {
         }
     }
 
-    public static boolean sendVerificationMail(String email, String user) throws IOException, FileNotFoundException {
+    public static boolean sendVerificationMail(String email, String user) throws IOException, SQLException {
+
+        Database d = Main.database;
+
+        Connection connection = d.getConnection(d.getDB_HOST(), d.getDB_NAME(), d.getDB_USER(), d.getDB_PASSWORD());
+        PreparedStatement ps;
+        ResultSet result;
 
         Properties prop = new Properties();
         /*
@@ -80,23 +90,33 @@ public abstract class Mail {
         });
         try {
 
-            String verificationCode = createRandomVerificationCode(user);
+            ps = connection.prepareStatement("select email from users where name = ?");
+            ps.setString(1, user);
+            result = ps.executeQuery();
+            if(result.next()) {
 
-            if(Objects.equals(verificationCode, "err")) return false;
+                String verificationCode = createRandomVerificationCode(user);
 
-            Message message = new MimeMessage(session);
-            //受信元
-            message.setFrom(new InternetAddress(mail));
-            //送信先
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(prop.getProperty(mail)));
-            //件名
-            message.setSubject("Account Verification");
-            //内容
-            message.setText("Hello! " + user + ".\nYour verification code is " + verificationCode + ".\n\nThank you for playing on Mamestagram!");
+                if (Objects.equals(verificationCode, "err")) return false;
 
-            Transport.send(message);
+                Message message = new MimeMessage(session);
+                //受信元
+                message.setFrom(new InternetAddress(mail));
+                //送信先
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(prop.getProperty(result.getString("email"))));
+                //件名
+                message.setSubject("Account Verification");
+                //内容
+                message.setText("Hello! " + user + ".\nYour verification code is " + verificationCode + ".\n\nThank you for playing on Mamestagram!");
 
-            return true;
+                Transport.send(message);
+
+                connection.close();
+
+                return true;
+            } else {
+                return false;
+            }
         } catch (MessagingException e) {
             System.out.println("Email sent unsuccessfully : " + e);
             return false;
