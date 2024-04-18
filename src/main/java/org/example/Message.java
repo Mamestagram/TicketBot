@@ -28,4 +28,17 @@ public abstract class Message {
 
         return eb;
     }
+
+    public static EmbedBuilder getChangePasswordMessage(int guidance) {
+
+        EmbedBuilder eb = new EmbedBuilder();
+
+        switch (guidance) {
+            case 0 -> {
+
+            }
+        }
+
+        return eb;
+    }
 }

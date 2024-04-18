@@ -8,12 +8,14 @@ public class Ticket {
     private final Member member;
     //Ticket Data
     private final int id;
+    private int support;
     private int verification_count;
 
-    Ticket(int id, Member m) {
+    public Ticket(int id, Member m) {
         this.id = id;
         this.member = m;
         this.verification_count = 0;
+        this.support = 0;
     }
 
     public int getId() {

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.example.Main;
 import org.example.Message;
 import org.example.Object.Bot;
+import org.example.Object.Ticket;
 
 import java.util.EnumSet;
 
@@ -62,6 +63,9 @@ public class CreateChannel extends ListenerAdapter {
                     .addRolePermissionOverride(1194245046321545327L, EnumSet.of(Permission.VIEW_CHANNEL), null)
                     .addPermissionOverride(g.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                     .queue();
+
+            //チケットのデータの追加
+            Main.tickets.add(new Ticket(ticketNo, e.getMember()));
         }
     }
 }
