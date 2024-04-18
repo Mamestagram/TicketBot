@@ -158,7 +158,7 @@ public class User extends ListenerAdapter {
                             .queue();
 
                 } else {
-                    e.reply("Sorry! Your username does not exist. Please start over!").setEphemeral(true).queue();
+                    e.reply("Hey! the username does not exist!").setEphemeral(true).queue();
                 }
             }
 

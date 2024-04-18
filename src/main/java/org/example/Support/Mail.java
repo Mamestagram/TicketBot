@@ -61,6 +61,7 @@ public abstract class Mail {
 
     public static boolean sendVerificationMail(String email, String user) throws IOException, SQLException {
 
+        //メールを送信できる何かサービスを探す
         Database d = Main.database;
 
         Connection connection = d.getConnection(d.getDB_HOST(), d.getDB_NAME(), d.getDB_USER(), d.getDB_PASSWORD());
@@ -68,16 +69,7 @@ public abstract class Mail {
         ResultSet result;
 
         Properties prop = new Properties();
-        /*
-        二段階認証が必要なので控えておく (mail.propertiesも設置する！)
 
-        * mailaddress= 自分のメールアドレス
-          password= アプリパスワード
-          mail.smtp.auth=true
-          mail.smtp.starttls.enable=true
-          mail.smtp.host=smtp.gmail.com
-          mail.smtp.port=587
-        * */
         prop.load(new FileReader("mail.properties"));
 
         final String mail = prop.getProperty("mailaddress");
@@ -104,7 +96,7 @@ public abstract class Mail {
                 message.setText("Hello! " + user + ".\nYour verification code is " + verificationCode + ".\nDo not share this code!\n\nThank you for playing on Mamestagram!");
 
                 Transport transport = session.getTransport("smtp");
-                transport.connect(prop.getProperty("mail.smtp.host"), 587, mail, password);
+                transport.connect(prop.getProperty("mail.smtp.host"), Integer.parseInt(prop.getProperty("mail.smtp.port")), mail, password);
                 transport.sendMessage(message, message.getAllRecipients());
                 transport.close();
 
