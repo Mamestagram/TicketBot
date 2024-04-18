@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.example.Event.CreateChannel;
 import org.example.Event.DeleteChannel;
+import org.example.Support.User;
 
 public class Bot {
 
@@ -72,6 +73,7 @@ public class Bot {
                         Activity.playing("Loading all settings.."))
                 .addEventListeners(new CreateChannel())
                 .addEventListeners(new DeleteChannel())
+                .addEventListeners(new User())
                 .build();
     }
 

@@ -10,12 +10,9 @@ public class Main {
     public static Bot bot;
     public static Database database;
 
-    public Main() {
+    public static void main(String[] args) {
         bot = new Bot();
         database = new Database();
-    }
-
-    public static void main(String[] args) {
         bot.loadJDA();
     }
 }

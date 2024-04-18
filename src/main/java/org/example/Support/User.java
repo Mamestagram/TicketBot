@@ -20,7 +20,7 @@ public class User extends ListenerAdapter {
             Bot bot = Main.bot;
             JDA jda = bot.getJda();
 
-                jda.getGuildById(bot.getGUILD_ID()).getTextChannelById(bot.getCHANNEL_ID()).sendMessageEmbeds(Message.getHelpTicketMessage().build())
+                jda.getGuildById(bot.getGUILD_ID()).getTextChannelById(e.getChannel().getId()).sendMessageEmbeds(Message.getHelpTicketMessage().build())
                     .addActionRow(
                     Button.success("change-password", "Change Password"),
                     Button.primary("forgot-login", "Forgot account"),
@@ -37,7 +37,7 @@ public class User extends ListenerAdapter {
                 ).addActionRow(
                         Button.success("change-password", "Change Password"),
                         Button.primary("forgot-login", "Forgot account"),
-                        Button.danger("other", "Other")
+                        Button.danger ("other", "Other")
                 ).queue();
             }
         }

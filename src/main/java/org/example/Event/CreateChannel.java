@@ -47,15 +47,20 @@ public class CreateChannel extends ListenerAdapter {
             //アクティブなチケットの最後の数字を取得する
             for(GuildChannel ch : g.getChannels()) {
                 if(ch.getName().contains("ticket-")) {
-                    if (ticketNo < Integer.parseInt(ch.getName().replace("ticket-", ""))) {
-                        ticketNo = Integer.parseInt(ch.getName().replace("ticket-", ""));
+                    if (ticketNo <= Integer.parseInt(ch.getName().replace("ticket-", ""))) {
+                        ticketNo = Integer.parseInt(ch.getName().replace("ticket-", "")) + 1;
                     }
                 }
             }
 
             //チケットを作成する
             g.createTextChannel("ticket-" + ticketNo, g.getCategoryById(bot.getCATEGORY_ID()))
-                    .addPermissionOverride(e.getMember(), EnumSet.of(Permission.MESSAGE_MENTION_EVERYONE), null)
+                    .addPermissionOverride(e.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
+                    //Nominator
+                    .addRolePermissionOverride(1093865053448589342L, EnumSet.of(Permission.VIEW_CHANNEL), null)
+                    //Server Moderator
+                    .addRolePermissionOverride(1194245046321545327L, EnumSet.of(Permission.VIEW_CHANNEL), null)
+                    .addPermissionOverride(g.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                     .queue();
         }
     }
