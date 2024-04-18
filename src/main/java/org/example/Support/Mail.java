@@ -89,12 +89,6 @@ public abstract class Mail {
             }
         });
         try {
-
-            ps = connection.prepareStatement("select email from users where name = ?");
-            ps.setString(1, user);
-            result = ps.executeQuery();
-            if(result.next()) {
-
                 String verificationCode = createRandomVerificationCode(user);
 
                 if (Objects.equals(verificationCode, "err")) return false;
@@ -103,20 +97,20 @@ public abstract class Mail {
                 //受信元
                 message.setFrom(new InternetAddress(mail));
                 //送信先
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(prop.getProperty(result.getString("email"))));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
                 //件名
                 message.setSubject("Account Verification");
                 //内容
                 message.setText("Hello! " + user + ".\nYour verification code is " + verificationCode + ".\nDo not share this code!\n\nThank you for playing on Mamestagram!");
 
-                Transport.send(message);
+                Transport transport = session.getTransport("smtp");
+                transport.connect(prop.getProperty("mail.smtp.host"), 587, mail, password);
+                transport.sendMessage(message, message.getAllRecipients());
+                transport.close();
 
                 connection.close();
 
                 return true;
-            } else {
-                return false;
-            }
         } catch (MessagingException e) {
             System.out.println("Email sent unsuccessfully : " + e);
             return false;

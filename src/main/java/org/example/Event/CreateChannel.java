@@ -66,6 +66,8 @@ public class CreateChannel extends ListenerAdapter {
 
             //チケットのデータの追加
             Main.tickets.add(new Ticket(ticketNo, e.getMember()));
+
+            e.reply("Created your ticket!").setEphemeral(true).queue();
         }
     }
 }
