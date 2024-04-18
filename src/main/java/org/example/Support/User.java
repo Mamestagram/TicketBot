@@ -49,7 +49,7 @@ public class User extends ListenerAdapter {
                     .addActionRow(
                     Button.success("change-password", "Change password"),
                     Button.primary("forgot-login", "Forgot account"),
-                    Button.danger("other", "Other")).queue();
+                    Button.danger("close", "Close")).queue();
         }
     }
 
@@ -63,7 +63,7 @@ public class User extends ListenerAdapter {
                     ).addActionRow(
                             Button.success("change-password", "Change password"),
                             Button.primary("forgot-login", "Forgot account"),
-                            Button.danger("other", "Other")
+                            Button.danger("close", "Close")
                     ).queue();
                 }
             }
@@ -108,10 +108,6 @@ public class User extends ListenerAdapter {
             }
 
             e.reply("ok").queue();
-        }
-        //その他のサポート (運営に直接連絡)
-        else if(e.getComponentId().equals("other")) {
-
         }
     }
 
@@ -158,7 +154,7 @@ public class User extends ListenerAdapter {
                             .queue();
 
                 } else {
-                    e.reply("Hey! the username does not exist!").setEphemeral(true).queue();
+                    e.reply("Hey! the email does not exist!").setEphemeral(true).queue();
                 }
             }
 

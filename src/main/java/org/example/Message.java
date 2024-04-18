@@ -44,4 +44,13 @@ public abstract class Message {
 
         return eb;
     }
+
+    public static EmbedBuilder getCloseCheckMessage() {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        eb.addField("Close Ticket", "Are you sure you want to close this ticket?", false);
+        eb.setColor(Color.RED);
+
+        return eb;
+    }
 }
