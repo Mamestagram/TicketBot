@@ -153,9 +153,7 @@ public class User extends ListenerAdapter {
                     t.setName(result.getString("name"));
                     t.setEmail(e.getValue("email").getAsString());
 
-                    e.reply("Please verify to continue this process").setEphemeral(true).queue();
-
-                    jda.getGuildById(bot.getGUILD_ID()).getTextChannelById(e.getChannel().getId()).sendMessageEmbeds(Message.getVerifyMessage().build())
+                    e.replyEmbeds(Message.getVerifyMessage().build())
                             .addActionRow(Button.success("verify-button", "Verify"))
                             .queue();
 
