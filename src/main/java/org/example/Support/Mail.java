@@ -107,7 +107,7 @@ public abstract class Mail {
                 //件名
                 message.setSubject("Account Verification");
                 //内容
-                message.setText("Hello! " + user + ".\nYour verification code is " + verificationCode + ".\n\nThank you for playing on Mamestagram!");
+                message.setText("Hello! " + user + ".\nYour verification code is " + verificationCode + ".\nDo not share this code!\n\nThank you for playing on Mamestagram!");
 
                 Transport.send(message);
 

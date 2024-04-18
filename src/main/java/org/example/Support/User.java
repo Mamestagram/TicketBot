@@ -32,14 +32,16 @@ public class User extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         if(e.getChannel().getName().contains("ticket-")) {
-            if(e.getMessage().getContentRaw().contains("Hello")) {
-                e.getMessage().reply("Hello, " + e.getMember().getNickname() + "!").addEmbeds(
-                        Message.getHelpTicketMessage().build()
-                ).addActionRow(
-                        Button.success("change-password", "Change password"),
-                        Button.primary("forgot-login", "Forgot account"),
-                        Button.danger ("other", "Other")
-                ).queue();
+            if (!e.getMember().getUser().isBot()) {
+                if (e.getMessage().getContentRaw().toLowerCase().contains("hello")) {
+                    e.getMessage().reply("Hello, " + e.getMember().getNickname() + "!").addEmbeds(
+                            Message.getHelpTicketMessage().build()
+                    ).addActionRow(
+                            Button.success("change-password", "Change password"),
+                            Button.primary("forgot-login", "Forgot account"),
+                            Button.danger("other", "Other")
+                    ).queue();
+                }
             }
         }
     }
