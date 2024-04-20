@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 // ユーザーのサポート関連の処理を書くクラス
 public class User extends ListenerAdapter {
@@ -108,6 +109,7 @@ public class User extends ListenerAdapter {
             }
 
             try {
+                //メール送信とメッセージを編集
                 if (Mail.sendVerificationMail(t.getEmail(), t.getName())) {
                     e.getMessage().editMessageEmbeds(Message.getVerifyCodeMessage().build()).setComponents(ActionRow.of(
                             Button.success("verify-code-button", "Enter Verification Code")
@@ -120,7 +122,7 @@ public class User extends ListenerAdapter {
                 e.reply("An unexpected error has occurred").setEphemeral(true).queue();
             }
         }
-
+        //認証コード
         else if(e.getComponentId().equals("verify-code-button")) {
             TextInput code = createTextInput("code", "Verification Code", "$2a$12$mDJmDSZZi/7jlMycrsVvqumaZFacck1tl2pz/YuYkIGmm87G6X4LC", true, TextInputStyle.SHORT);
             Modal modal = Modal.create("code-modal", "Verification of Identity Information")
@@ -140,6 +142,7 @@ public class User extends ListenerAdapter {
             PreparedStatement ps;
             ResultSet result;
 
+            //メールアドレスの確認
             if (e.getModalId().equals("email-modal")) {
                 ps = connection.prepareStatement("select id, name from users where email = ?");
                 ps.setString(1, e.getValue("email").getAsString());
@@ -171,6 +174,35 @@ public class User extends ListenerAdapter {
 
                 } else {
                     e.reply("Hey! the email does not exist!").setEphemeral(true).queue();
+                }
+            } else if(e.getModalId().equals("code-modal")) {
+                //チケットインスタンスの作成
+                if (!Main.tickets.isEmpty()) {
+                    for (Ticket ticket : Main.tickets) {
+                        if (e.getChannel().getName().contains(String.valueOf(ticket.getId()))) {
+                            t = ticket;
+                        }
+                    }
+                }
+
+                if (t == null) {
+                    e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
+                    return;
+                }
+
+                //認証コードの確認
+                ps = connection.prepareStatement("select verification_code from users where name = ?");
+                ps.setString(1, t.getName());
+                result = ps.executeQuery();
+
+                if(result.next()) {
+                    if(Objects.equals(e.getValue("code").getAsString(), result.getString("verification_code"))) {
+                        e.reply("Verification successful!").setEphemeral(true).queue();
+                    } else {
+                        e.reply("Verification failed!\nYour verification code may wrong!").setEphemeral(true).queue();
+                    }
+                } else {
+                    e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
                 }
             }
 
