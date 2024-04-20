@@ -104,6 +104,7 @@ public class User extends ListenerAdapter {
 
             if (t == null) {
                 e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
+                e.getMessage().delete().queue();
                 return;
             }
 
@@ -116,10 +117,12 @@ public class User extends ListenerAdapter {
                     )).queue();
                 } else {
                     e.reply("An unexpected error has occurred").setEphemeral(true).queue();
+                    e.getMessage().delete().queue();
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
                 e.reply("An unexpected error has occurred").setEphemeral(true).queue();
+                e.getMessage().delete().queue();
             }
         }
         // 認証コード
@@ -194,6 +197,7 @@ public class User extends ListenerAdapter {
 
                 if (t == null) {
                     e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
+                    e.getMessage().delete().queue();
                     return;
                 }
 
@@ -213,6 +217,7 @@ public class User extends ListenerAdapter {
                     }
                 } else {
                     e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
+                    e.getMessage().delete().queue();
                 }
             }
             //パスワードの変更
@@ -228,6 +233,7 @@ public class User extends ListenerAdapter {
 
                 if (t == null) {
                     e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
+                    e.getMessage().delete().queue();
                     return;
                 }
 
@@ -245,6 +251,7 @@ public class User extends ListenerAdapter {
     } catch (SQLException e1) {
             e1.printStackTrace();
             e.reply("An unexpected error has occurred").setEphemeral(true).queue();
+            e.getMessage().delete().queue();
         }
     }
 }
