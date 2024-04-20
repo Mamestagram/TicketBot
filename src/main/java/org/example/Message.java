@@ -45,6 +45,18 @@ public abstract class Message {
         return eb;
     }
 
+    public static EmbedBuilder getVerifyCodeMessage() {
+
+        EmbedBuilder eb = new EmbedBuilder();
+
+        eb.addField("Verify your request", """
+                           Please enter the code that was sent to your email
+                            """, false);
+        eb.setColor(Color.GREEN);
+
+        return eb;
+    }
+
     public static EmbedBuilder getCloseCheckMessage() {
         EmbedBuilder eb = new EmbedBuilder();
 

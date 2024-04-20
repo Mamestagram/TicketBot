@@ -59,14 +59,7 @@ public abstract class Mail {
         }
     }
 
-    public static boolean sendVerificationMail(String email, String user) throws IOException, SQLException {
-
-        //メールを送信できる何かサービスを探す
-        Database d = Main.database;
-
-        Connection connection = d.getConnection(d.getDB_HOST(), d.getDB_NAME(), d.getDB_USER(), d.getDB_PASSWORD());
-        PreparedStatement ps;
-        ResultSet result;
+    public static boolean sendVerificationMail(String email, String user) throws IOException, FileNotFoundException {
 
         Properties prop = new Properties();
 
@@ -77,32 +70,28 @@ public abstract class Mail {
 
         Session session = Session.getInstance(prop, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, password);
+                return new PasswordAuthentication(mail, password);
             }
         });
         try {
-                String verificationCode = createRandomVerificationCode(user);
 
-                if (Objects.equals(verificationCode, "err")) return false;
+            String verificationCode = createRandomVerificationCode(user);
 
-                Message message = new MimeMessage(session);
-                //受信元
-                message.setFrom(new InternetAddress(mail));
-                //送信先
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
-                //件名
-                message.setSubject("Account Verification");
-                //内容
-                message.setText("Hello! " + user + ".\nYour verification code is " + verificationCode + ".\nDo not share this code!\n\nThank you for playing on Mamestagram!");
+            if(Objects.equals(verificationCode, "err")) return false;
 
-                Transport transport = session.getTransport("smtp");
-                transport.connect(prop.getProperty("mail.smtp.host"), Integer.parseInt(prop.getProperty("mail.smtp.port")), mail, password);
-                transport.sendMessage(message, message.getAllRecipients());
-                transport.close();
+            Message message = new MimeMessage(session);
+            //受信元
+            message.setFrom(new InternetAddress(mail));
+            //送信先
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+            //件名
+            message.setSubject("Account Verification");
+            //内容
+            message.setText("Hello! " + user + ".\nYour verification code is\n\n" + verificationCode + "\n\nThank you for playing on Mamestagram!");
 
-                connection.close();
+            Transport.send(message);
 
-                return true;
+            return true;
         } catch (MessagingException e) {
             System.out.println("Email sent unsuccessfully : " + e);
             return false;

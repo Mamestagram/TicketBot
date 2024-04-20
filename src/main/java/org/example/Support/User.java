@@ -1,12 +1,15 @@
 package org.example.Support;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Component;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -24,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 
 // ユーザーのサポート関連の処理を書くクラス
 public class User extends ListenerAdapter {
@@ -57,7 +61,7 @@ public class User extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
         if(e.getChannel().getName().contains("ticket-")) {
             if (!e.getMember().getUser().isBot()) {
-                if (e.getMessage().getContentRaw().toLowerCase().contains("hello")) {
+                if (e.getMessage().getContentRaw().toLowerCase().equals("hello")) {
                     e.getMessage().reply("Hello, " + e.getMember().getNickname() + "!").addEmbeds(
                             Message.getHelpTicketMessage().build()
                     ).addActionRow(
@@ -87,6 +91,9 @@ public class User extends ListenerAdapter {
         //認証
         else if(e.getComponentId().equals("verify-button")) {
             Ticket t = null;
+            Bot bot = Main.bot;
+            JDA jda = bot.getJda();
+
             if (!Main.tickets.isEmpty()) {
                 for (Ticket ticket : Main.tickets) {
                     if (e.getChannel().getName().contains(String.valueOf(ticket.getId()))) {
@@ -101,13 +108,24 @@ public class User extends ListenerAdapter {
             }
 
             try {
-                Mail.sendVerificationMail(t.getEmail(), t.getName());
-            } catch (SQLException | IOException e1) {
+                if (Mail.sendVerificationMail(t.getEmail(), t.getName())) {
+                    e.getMessage().editMessageEmbeds(Message.getVerifyCodeMessage().build()).setComponents(ActionRow.of(
+                            Button.success("verify-code-button", "Enter Verification Code")
+                    )).queue();
+                } else {
+                    e.reply("An unexpected error has occurred").setEphemeral(true).queue();
+                }
+            } catch (IOException e1) {
                 e1.printStackTrace();
                 e.reply("An unexpected error has occurred").setEphemeral(true).queue();
             }
+        }
 
-            e.reply("ok").queue();
+        else if(e.getComponentId().equals("verify-code-button")) {
+            TextInput code = createTextInput("code", "Verification Code", "$2a$12$mDJmDSZZi/7jlMycrsVvqumaZFacck1tl2pz/YuYkIGmm87G6X4LC", true, TextInputStyle.SHORT);
+            Modal modal = Modal.create("code-modal", "Verification of Identity Information")
+                    .addActionRows(ActionRow.of(code)).build();
+            e.replyModal(modal).queue();
         }
     }
 
@@ -116,8 +134,6 @@ public class User extends ListenerAdapter {
 
         try {
             Database d = Main.database;
-            Bot bot = Main.bot;
-            JDA jda = bot.getJda();
             Ticket t = null;
 
             Connection connection = d.getConnection(d.getDB_HOST(), d.getDB_NAME(), d.getDB_USER(), d.getDB_PASSWORD());
