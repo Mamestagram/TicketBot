@@ -54,7 +54,7 @@ public class User extends ListenerAdapter {
                 jda.getGuildById(bot.getGUILD_ID()).getTextChannelById(e.getChannel().getId()).sendMessageEmbeds(Message.getHelpTicketMessage().build())
                     .addActionRow(
                     Button.success("change-password", "Change password"),
-                    Button.primary("forgot-login", "Forgot account"),
+                    Button.primary("forgot-login", "Forgot my name"),
                     Button.danger("close", "Close")).queue();
         }
     }
@@ -68,7 +68,7 @@ public class User extends ListenerAdapter {
                             Message.getHelpTicketMessage().build()
                     ).addActionRow(
                             Button.success("change-password", "Change password"),
-                            Button.primary("forgot-login", "Forgot account"),
+                            Button.primary("forgot-login", "Forgot my name"),
                             Button.danger("close", "Close")
                     ).queue();
                 }
@@ -88,7 +88,11 @@ public class User extends ListenerAdapter {
         }
         //ログイン情報
         else if(e.getComponentId().equals("forgot-login")) {
+            TextInput name = createTextInput("email", "Your Email", "test@gmail.com", true, TextInputStyle.SHORT);
+            Modal modal = Modal.create("forgot-name-modal", "Verification of Identity Information")
+                    .addActionRows(ActionRow.of(name)).build();
 
+            e.replyModal(modal).queue();
         }
         //認証
         else if(e.getComponentId().equals("verify-button")) {
@@ -109,9 +113,10 @@ public class User extends ListenerAdapter {
             }
 
             try {
-                //メール送信とメッセージを編集
+                //メール送信とメッセージを送信
+
                 if (Mail.sendVerificationMail(t.getEmail(), t.getName())) {
-                    e.reply("Verification code sent on your email!").setEphemeral(true).queue();
+                    e.reply("Verification code sent to your email!").setEphemeral(true).queue();
                     e.getMessage().editMessageEmbeds(Message.getVerifyCodeMessage().build()).setComponents(ActionRow.of(
                             Button.success("verify-code-button", "Enter Verification Code")
                     )).queue();
@@ -244,6 +249,23 @@ public class User extends ListenerAdapter {
                 }
                 e.reply("Password changed successfully!").setEphemeral(true).queue();
                 e.getMessage().editMessageEmbeds(Message.getCompleteMessage().build()).setComponents().queue();
+            }
+            //名前を忘れてしまった
+            else if (e.getModalId().equals("forgot-name-modal")) {
+                ps = connection.prepareStatement("select name from users where email = ?");
+                ps.setString(1, e.getValue("email").getAsString());
+                result = ps.executeQuery();
+                if(result.next()) {
+                    try {
+                        e.reply("Your name sent to your email").setEphemeral(true).queue();
+                        e.getMessage().replyEmbeds(Message.getCompleteMessage().build()).queue();
+                        Mail.sendNameNotificationMail(e.getValue("email").getAsString(), result.getString("name"));
+                    } catch(IOException e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    e.reply("Hey! the email does not exist!").setEphemeral(true).queue();
+                }
             }
 
             connection.close();

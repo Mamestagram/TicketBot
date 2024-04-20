@@ -97,4 +97,38 @@ public abstract class Mail {
             return false;
         }
     }
+
+    public static boolean sendNameNotificationMail(String email, String user) throws IOException, FileNotFoundException {
+
+        Properties prop = new Properties();
+
+        prop.load(new FileReader("mail.properties"));
+
+        final String mail = prop.getProperty("mailaddress");
+        final String password = prop.getProperty("password");
+
+        Session session = Session.getInstance(prop, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(mail, password);
+            }
+        });
+        try {
+            Message message = new MimeMessage(session);
+            //受信元
+            message.setFrom(new InternetAddress(mail));
+            //送信先
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+            //件名
+            message.setSubject("Forgot your username?");
+            //内容
+            message.setText("Hello!\n" + "Your name is\n\n" + user + "\n\nThank you for playing on Mamestagram!");
+
+            Transport.send(message);
+
+            return true;
+        } catch (MessagingException e) {
+            System.out.println("Email sent unsuccessfully : " + e);
+            return false;
+        }
+    }
 }
