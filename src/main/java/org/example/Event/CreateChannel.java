@@ -43,14 +43,15 @@ public class CreateChannel extends ListenerAdapter {
             Bot bot = Main.bot;
 
             //初期値: 1
+
             int ticketNo = 1;
 
-            //アクティブなチケットの最後の数字を取得する
-            for(GuildChannel ch : g.getChannels()) {
-                if(ch.getName().contains("ticket-")) {
-                    if (ticketNo <= Integer.parseInt(ch.getName().replace("ticket-", ""))) {
-                        ticketNo = Integer.parseInt(ch.getName().replace("ticket-", "")) + 1;
-                    }
+            // アクティブなチケットと閉じているチケットの最後の数字を取得する
+            for (GuildChannel ch : g.getChannels()) {
+                if (ch.getName().contains("ticket-")) {
+                    ticketNo = Math.max(ticketNo, Integer.parseInt(ch.getName().replace("ticket-", "")) + 1);
+                } else if (ch.getName().contains("closed-")) {
+                    ticketNo = Math.max(ticketNo, Integer.parseInt(ch.getName().replace("closed-", "")) + 1);
                 }
             }
 

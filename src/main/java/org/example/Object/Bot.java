@@ -4,12 +4,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.example.Event.CreateChannel;
-import org.example.Event.DeleteChannel;
+import org.example.Event.CloseChannel;
 import org.example.Support.User;
 
 public class Bot {
@@ -72,7 +70,7 @@ public class Bot {
                 ).setActivity(
                         Activity.playing("Loading all settings.."))
                 .addEventListeners(new CreateChannel())
-                .addEventListeners(new DeleteChannel())
+                .addEventListeners(new CloseChannel())
                 .addEventListeners(new User())
                 .build();
     }
