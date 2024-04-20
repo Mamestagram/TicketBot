@@ -40,7 +40,7 @@ public abstract class Message {
         eb.addField("Verify your request", """
                            Click on the **Verify** to send a confirmation code to your registered email
                             """, false);
-        eb.setColor(Color.GREEN);
+        eb.setColor(Color.CYAN);
 
         return eb;
     }
@@ -52,6 +52,24 @@ public abstract class Message {
         eb.addField("Verify your request", """
                            Please enter the code that was sent to your email
                             """, false);
+        eb.setColor(Color.CYAN);
+
+        return eb;
+    }
+
+    public static EmbedBuilder getChangePasswordMessage() {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        eb.addField("Change Password", "Please enter your new password!", false);
+        eb.setColor(Color.CYAN);
+
+        return eb;
+    }
+
+    public static EmbedBuilder getCompleteMessage() {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        eb.addField("Complete", "Your request has been completed!", false);
         eb.setColor(Color.GREEN);
 
         return eb;

@@ -22,6 +22,7 @@ import org.example.Object.Database;
 import org.example.Object.Ticket;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -92,8 +93,6 @@ public class User extends ListenerAdapter {
         //認証
         else if(e.getComponentId().equals("verify-button")) {
             Ticket t = null;
-            Bot bot = Main.bot;
-            JDA jda = bot.getJda();
 
             if (!Main.tickets.isEmpty()) {
                 for (Ticket ticket : Main.tickets) {
@@ -111,6 +110,7 @@ public class User extends ListenerAdapter {
             try {
                 //メール送信とメッセージを編集
                 if (Mail.sendVerificationMail(t.getEmail(), t.getName())) {
+                    e.reply("Verification code sent on your email!").setEphemeral(true).queue();
                     e.getMessage().editMessageEmbeds(Message.getVerifyCodeMessage().build()).setComponents(ActionRow.of(
                             Button.success("verify-code-button", "Enter Verification Code")
                     )).queue();
@@ -122,11 +122,18 @@ public class User extends ListenerAdapter {
                 e.reply("An unexpected error has occurred").setEphemeral(true).queue();
             }
         }
-        //認証コード
+        // 認証コード
         else if(e.getComponentId().equals("verify-code-button")) {
             TextInput code = createTextInput("code", "Verification Code", "$2a$12$mDJmDSZZi/7jlMycrsVvqumaZFacck1tl2pz/YuYkIGmm87G6X4LC", true, TextInputStyle.SHORT);
             Modal modal = Modal.create("code-modal", "Verification of Identity Information")
                     .addActionRows(ActionRow.of(code)).build();
+            e.replyModal(modal).queue();
+        }
+        // パスワードの変更
+        else if(e.getComponentId().equals("change-password-button")) {
+            TextInput password = createTextInput("password", "New Password", "password", true, TextInputStyle.SHORT);
+            Modal modal = Modal.create("password-modal", "Change Password")
+                    .addActionRows(ActionRow.of(password)).build();
             e.replyModal(modal).queue();
         }
     }
@@ -198,12 +205,39 @@ public class User extends ListenerAdapter {
                 if(result.next()) {
                     if(Objects.equals(e.getValue("code").getAsString(), result.getString("verification_code"))) {
                         e.reply("Verification successful!").setEphemeral(true).queue();
+                        e.getMessage().editMessageEmbeds(Message.getChangePasswordMessage().build()).setComponents(ActionRow.of(
+                                Button.success("change-password-button", "Change Password")
+                        )).queue();
                     } else {
                         e.reply("Verification failed!\nYour verification code may wrong!").setEphemeral(true).queue();
                     }
                 } else {
                     e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
                 }
+            }
+            //パスワードの変更
+            else if (e.getModalId().equals("password-modal")) {
+                //チケットインスタンスの作成
+                if (!Main.tickets.isEmpty()) {
+                    for (Ticket ticket : Main.tickets) {
+                        if (e.getChannel().getName().contains(String.valueOf(ticket.getId()))) {
+                            t = ticket;
+                        }
+                    }
+                }
+
+                if (t == null) {
+                    e.reply("An unexpected error has occurred! Please start over").setEphemeral(true).queue();
+                    return;
+                }
+
+                try {
+                    Password.changeUserPassword(t.getName(), e.getValue("password").getAsString());
+                } catch (NoSuchAlgorithmException e1) {
+                    e1.printStackTrace();
+                }
+                e.reply("Password changed successfully!").setEphemeral(true).queue();
+                e.getMessage().editMessageEmbeds(Message.getCompleteMessage().build()).setComponents().queue();
             }
 
             connection.close();

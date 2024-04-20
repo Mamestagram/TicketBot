@@ -10,13 +10,10 @@ public class Ticket {
     private final int id;
     private String email;
     private String name;
-    private int verification_count;
-    private long verification_time;
 
     public Ticket(int id, Member m) {
         this.id = id;
         this.member = m;
-        this.verification_count = 0;
     }
 
     public String getEmail() {
@@ -39,15 +36,4 @@ public class Ticket {
         return id;
     }
 
-    public Member getMember() {
-        return member;
-    }
-
-    public int getVerification_count() {
-        return verification_count;
-    }
-
-    public void setVerification_count(int verification_count) {
-        this.verification_count = verification_count;
-    }
 }
