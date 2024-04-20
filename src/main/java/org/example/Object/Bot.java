@@ -68,7 +68,7 @@ public class Bot {
                         CacheFlag.STICKER,
                         CacheFlag.SCHEDULED_EVENTS
                 ).setActivity(
-                        Activity.playing("Loading all settings.."))
+                        Activity.playing("Supporting for all users"))
                 .addEventListeners(new CreateChannel())
                 .addEventListeners(new CloseChannel())
                 .addEventListeners(new User())

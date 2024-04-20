@@ -12,7 +12,7 @@ public abstract class Message {
     public static EmbedBuilder getOpenTicketMessage() {
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.addField("Support", "To receive assistance from developer or admin, please create a ticket. No matter how trivial it may seem!", true);
+        eb.addField("Support", ":lock:  Change password\n:page_with_curl:  Send your name\n:white_check_mark:  Support from admin and developer", true);
         eb.setFooter("mamesosu.net | Ticket Tool");
         eb.setColor(Color.CYAN);
 
